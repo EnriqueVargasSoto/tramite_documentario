@@ -132,7 +132,7 @@ export default {
 @import url('/public/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css');
 @import url('/public/assets/vendor/libs/typeahead-js/typeahead.css');
 
-@import url('/public/assets/vendor/libs/@form-validation/form-validation.css');
+@import url('/public/assets/vendor/libs/form-validation/form-validation.css');
 
 @import url('/public/assets/vendor/css/pages/page-auth.css');
 </style>
