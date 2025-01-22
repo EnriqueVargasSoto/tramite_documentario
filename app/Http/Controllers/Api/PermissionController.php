@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\WebController;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -11,12 +11,12 @@ class PermissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        /* $permissions = Permission::orderBy('id','DESC')->paginate(5);
-        return view('intranet.pages.permissions.index',compact('permissions'))->with('i', ($request->input('page', 1) - 1) * 5); */
-        return view('intranet.pages.permissions.index');
+        $permissions = Permission::with('roles')->orderBy('id','ASC')->paginate($request->per_page);
+
+        return response()->json( $permissions, 200);
     }
 
     /**

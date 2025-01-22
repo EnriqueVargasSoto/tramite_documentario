@@ -151,31 +151,53 @@
  <script src="{{asset('assets/vendor/libs/form-validation/auto-focus.js')}}"></script>
 
  <!-- Page JS -->
-<script src="{{asset('assets/js/app-access-permission.js')}}"></script>
+{{-- <script src="{{asset('assets/js/app-access-permission.js')}}"></script> --}}
 <script src="{{asset('assets/js/modal-add-permission.js')}}"></script>
 <script src="{{asset('assets/js/modal-edit-permission.js')}}"></script>
 
-<script>
-    $(function() {
-  'use strict';
+<!-- jQuery desde CDN -->
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
-  var dt_basic_table = $('.datatables-users');
+{{-- <script>
+/**
+ * App user list (jquery)
+ */
 
-  // DataTable with buttons
-  // --------------------------------------------------------------------
+ 'use strict';
 
-  /* if (dt_basic_table.length) {
-    dt_basic = dt_basic_table.DataTable({
-      ajax: assetsPath + 'json/table-datatable.json',
+$(function () {
+  var dataTablePermissions = $('.datatables-permissions'),
+    dt_permission,
+    userList = 'app-user-list.html';
+    var cantRegistros = 10;//dataTablePermissions.DataTable().page.len();
+    var apiUrl = 'http://127.0.0.1:8000/api/permissions?page=1&per_page='+cantRegistros;
+
+  // Users List datatable
+  if (dataTablePermissions.length) {
+
+    dt_permission = dataTablePermissions.DataTable({
+      //ajax: assetsPath + 'json/permissions-list.json', // JSON file to add data
+      processing: true,
+        serverSide: true,
+      ajax: {
+        url: apiUrl,
+       // dataSrc: 'data.data' // Ruta hacia los datos en la respuesta paginada
+       dataSrc: function (json) {
+        var data = json.data.data; // Los datos de la respuesta
+
+
+
+
+        return data;
+        }
+      },
       columns: [
+        // columns according to JSON
         { data: '' },
         { data: 'id' },
-        { data: 'id' },
-        { data: 'full_name' },
-        { data: 'email' },
-        { data: 'start_date' },
-        { data: 'salary' },
-        { data: 'status' },
+        { data: 'name' },
+        { data: 'guard_name' },
+        { data: 'created_at' },
         { data: '' }
       ],
       columnDefs: [
@@ -191,163 +213,112 @@
           }
         },
         {
-          // For Checkboxes
           targets: 1,
-          orderable: false,
-          searchable: false,
-          responsivePriority: 3,
-          checkboxes: true,
-          render: function () {
-            return '<input type="checkbox" class="dt-checkboxes form-check-input">';
-          },
-          checkboxes: {
-            selectAllRender: '<input type="checkbox" class="form-check-input">'
-          }
-        },
-        {
-          targets: 2,
           searchable: false,
           visible: false
         },
         {
-          // Avatar image/badge, Name and post
-          targets: 3,
-          responsivePriority: 4,
+          // Name
+          targets: 2,
           render: function (data, type, full, meta) {
-            var $user_img = full['avatar'],
-              $name = full['full_name'],
-              $post = full['post'];
-            if ($user_img) {
-              // For Avatar image
-              var $output =
-                '<img src="' + assetsPath + 'img/avatars/' + $user_img + '" alt="Avatar" class="rounded-circle">';
-            } else {
-              // For Avatar badge
-              var stateNum = Math.floor(Math.random() * 6);
-              var states = ['success', 'danger', 'warning', 'info', 'primary', 'secondary'];
-              var $state = states[stateNum],
-                $name = full['full_name'],
-                $initials = $name.match(/\b\w/g) || [];
-              $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-              $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
-            }
-            // Creates full output for row
-            var $row_output =
-              '<div class="d-flex justify-content-start align-items-center user-name">' +
-              '<div class="avatar-wrapper">' +
-              '<div class="avatar me-2">' +
-              $output +
-              '</div>' +
-              '</div>' +
-              '<div class="d-flex flex-column">' +
-              '<span class="emp_name text-truncate">' +
-              $name +
-              '</span>' +
-              '<small class="emp_post text-truncate text-muted">' +
-              $post +
-              '</small>' +
-              '</div>' +
-              '</div>';
-            return $row_output;
+            var $name = full['name'];
+            return '<span class="text-nowrap">' + $name + '</span>';
           }
         },
         {
-          responsivePriority: 1,
-          targets: 4
+          // User Role
+          targets: 3,
+          orderable: false,
+          render: function (data, type, full, meta) {
+            var $assignedTo = full['roles'],
+              $output = '';
+            var roleBadgeObj = {
+              Admin: '<a href="' + userList + '"><span class="badge bg-label-primary m-1">Administrator</span></a>',
+              Manager: '<a href="' + userList + '"><span class="badge bg-label-warning m-1">Manager</span></a>',
+              Users: '<a href="' + userList + '"><span class="badge bg-label-success m-1">Users</span></a>',
+              Support: '<a href="' + userList + '"><span class="badge bg-label-info m-1">Support</span></a>',
+              Restricted:
+                '<a href="' + userList + '"><span class="badge bg-label-danger m-1">Restricted User</span></a>'
+            };
+            for (var i = 0; i < $assignedTo.length; i++) {
+              var val = $assignedTo[i]['name'];
+              $output += roleBadgeObj[val];
+            }
+            return '<span class="text-nowrap">' + $output + '</span>';
+          }
         },
         {
-          // Label
-          targets: -2,
+          // remove ordering from Name
+          targets: 4,
+          orderable: false,
           render: function (data, type, full, meta) {
-            var $status_number = full['status'];
-            var $status = {
-              1: { title: 'Current', class: 'bg-label-primary' },
-              2: { title: 'Professional', class: ' bg-label-success' },
-              3: { title: 'Rejected', class: ' bg-label-danger' },
-              4: { title: 'Resigned', class: ' bg-label-warning' },
-              5: { title: 'Applied', class: ' bg-label-info' }
-            };
-            if (typeof $status[$status_number] === 'undefined') {
-              return data;
-            }
-            return (
-              '<span class="badge ' + $status[$status_number].class + '">' + $status[$status_number].title + '</span>'
-            );
+            var $date = full['created_at'];
+            return '<span class="text-nowrap">' + $date + '</span>';
           }
         },
         {
           // Actions
           targets: -1,
+          searchable: false,
           title: 'Actions',
           orderable: false,
-          searchable: false,
           render: function (data, type, full, meta) {
             return (
-              '<div class="d-inline-block">' +
-              '<a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>' +
-              '<ul class="dropdown-menu dropdown-menu-end m-0">' +
-              '<li><a href="javascript:;" class="dropdown-item">Details</a></li>' +
-              '<li><a href="javascript:;" class="dropdown-item">Archive</a></li>' +
-              '<div class="dropdown-divider"></div>' +
-              '<li><a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a></li>' +
-              '</ul>' +
-              '</div>' +
-              '<a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>'
+              '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2" data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
+              '<button class="btn btn-sm btn-icon delete-record"><i class="ti ti-trash"></i></button></span>'
             );
           }
         }
       ],
-      order: [[2, 'desc']],
-      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-      displayLength: 7,
-      lengthMenu: [7, 10, 25, 50, 75, 100],
+      order: [[1, 'asc']],
+      dom:
+        '<"row mx-1"' +
+        '<"col-sm-12 col-md-3" l>' +
+        '<"col-sm-12 col-md-9"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-md-end justify-content-center flex-wrap me-1"<"me-3"f>B>>' +
+        '>t' +
+        '<"row mx-2"' +
+        '<"col-sm-12 col-md-6"i>' +
+        '<"col-sm-12 col-md-6"p>' +
+        '>',
+      language: {
+        sLengthMenu: 'Ver _MENU_',
+        search: 'Buscar',
+        searchPlaceholder: 'Buscar...',
+        paginate: {
+          first: 'Primera',
+          previous: 'Anterior',
+          next: 'Siguiente',
+          last: 'Última'
+        },
+        info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+        infoEmpty: 'No hay registros disponibles',
+        infoFiltered: '(filtrado de _MAX_ registros)',
+        zeroRecords: 'No se encontraron registros coincidentes',
+        emptyTable: 'No hay datos disponibles en la tabla',
+        loadingRecords: 'Cargando...',
+        processing: 'Procesando...',
+      },
+      // Buttons with Dropdown
       buttons: [
         {
-          extend: 'collection',
-          className: 'btn btn-label-primary dropdown-toggle me-2',
-          text: '<i class="ti ti-file-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
-          buttons: [
-            {
-              extend: 'print',
-              text: '<i class="ti ti-printer me-1" ></i>Print',
-              className: 'dropdown-item',
-              exportOptions: { columns: [3, 4, 5, 6, 7] }
-            },
-            {
-              extend: 'csv',
-              text: '<i class="ti ti-file-text me-1" ></i>Csv',
-              className: 'dropdown-item',
-              exportOptions: { columns: [3, 4, 5, 6, 7] }
-            },
-            {
-              extend: 'pdf',
-              text: '<i class="ti ti-file-description me-1"></i>Pdf',
-              className: 'dropdown-item',
-              exportOptions: { columns: [3, 4, 5, 6, 7] }
-            },
-            {
-              extend: 'copy',
-              text: '<i class="ti ti-copy me-1" ></i>Copy',
-              className: 'dropdown-item',
-              exportOptions: { columns: [3, 4, 5, 6, 7] }
-            }
-          ]
-        },
-        {
-          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add New Record</span>',
-          className: 'create-new btn btn-primary',
-          action: function () {
-            $('#addRoleModal').modal('show'); // Muestra el modal
-            }
-        },
-
+          text: 'Agregar Permiso',
+          className: 'add-new btn btn-primary mb-3 mb-md-0 waves-effect waves-light',
+          attr: {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#addPermissionModal'
+          },
+          init: function (api, node, config) {
+            $(node).removeClass('btn-secondary');
+          }
+        }
       ],
+      // For responsive popup
       responsive: {
         details: {
           display: $.fn.dataTable.Responsive.display.modal({
             header: function (row) {
               var data = row.data();
-              return 'Details of ' + data['full_name'];
+              return 'Details of ' + data['name'];
             }
           }),
           type: 'column',
@@ -373,11 +344,197 @@
             return data ? $('<table class="table"/><tbody />').append(data) : false;
           }
         }
-      }
+      },
+      initComplete: function () {
+        // Adding role filter once table initialized
+        this.api()
+          .columns(3)
+          .every(function () {
+            var column = this;
+            var select = $(
+              '<select id="UserRole" class="form-select text-capitalize"><option value=""> Select Role </option></select>'
+            )
+              .appendTo('.user_role')
+              .on('change', function () {
+                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                column.search(val ? '^' + val + '$' : '', true, false).draw();
+              });
+
+            column
+              .data()
+              .unique()
+              .sort()
+              .each(function (d, j) {
+                select.append('<option value="' + d + '" class="text-capitalize">' + d + '</option>');
+              });
+          });
+      },
+      /* drawCallback: function (settings) {
+        console.log('settings: ',settings);
+        var api = this.api();
+        console.log('api: ',api);
+        var totalPages = api.page.info().pages;
+        console.log('total de paginas: ',totalPages);
+        // Lógica para manejar la paginación
+        /* if (totalPages > 1) {
+          // Muestra los controles de paginación
+          $('.dataTables_paginate').show();
+        } else {
+          // Oculta los controles si hay solo una página
+          $('.dataTables_paginate').hide();
+        }
+      } */
     });
-    $('div.head-label').html('<h5 class="card-title mb-0">DataTable with Buttons</h5>');
-  } */
+  }
+
+  // Delete Record
+  $('.datatables-permissions tbody').on('click', '.delete-record', function () {
+    dt_permission.row($(this).parents('tr')).remove().draw();
+  });
+
+  // Filter form control to default size
+  // ? setTimeout used for multilingual table initialization
+  setTimeout(() => {
+    $('.dataTables_filter .form-control').removeClass('form-control-sm');
+    $('.dataTables_length .form-select').removeClass('form-select-sm');
+  }, 300);
 });
+
+
+</script> --}}
+
+<script>
+    $(document).ready(function () {
+        var dataTablePermissions = $('.datatables-permissions'),
+        dt_permission,
+        userList = 'app-user-list.html';
+        var cantRegistros = 10;//dataTablePermissions.DataTable().page.len();
+        var apiUrl = 'http://127.0.0.1:8000/api/permissions?page=1&per_page='+cantRegistros;
+
+        $.ajax({
+            url: apiUrl,
+            type: 'GET',
+            success: function (response) {
+
+                const {current_page, data, first_page_url, from, last_page, last_page_url, links, next_page_url, path, per_page, prev_page_url, to, total} = response;
+
+                if (dataTablePermissions.length){
+                    dt_permission = dataTablePermissions.DataTable({
+                        processing: true,
+                        serverSide: true,
+                        data: data || [],
+                        ajax: {
+                            url: apiUrl,
+                        // dataSrc: 'data.data' // Ruta hacia los datos en la respuesta paginada
+                            dataSrc: function (json) {
+                                //var data = json.data; // Los datos de la respuesta
+
+
+
+
+                                return json.data;
+                            }
+                        },
+                        columns: [
+                            // columns according to JSON
+                            { data: '' },
+                            { data: 'id' },
+                            { data: 'name' },
+                            { data: 'guard_name' },
+                            { data: 'created_at' },
+                            { data: '' }
+                        ],
+                        columnDefs: [
+                            {
+                                // For Responsive
+                                className: 'control',
+                                orderable: false,
+                                searchable: false,
+                                responsivePriority: 2,
+                                targets: 0,
+                                render: function (data, type, full, meta) {
+                                    return '';
+                                }
+                            },
+                            {
+                                targets: 1,
+                                searchable: false,
+                                visible: false
+                            },
+                            {
+                                // Name
+                                targets: 2,
+                                render: function (data, type, full, meta) {
+                                    var $name = full['name'];
+                                    return '<span class="text-nowrap">' + $name + '</span>';
+                                }
+                            },
+                            {
+                                // User Role
+                                targets: 3,
+                                orderable: false,
+                                render: function (data, type, full, meta) {
+                                    var $assignedTo = full['roles'],
+                                    $output = '';
+                                    var roleBadgeObj = {
+                                    Admin: '<a href="' + userList + '"><span class="badge bg-label-primary m-1">Administrator</span></a>',
+                                    Manager: '<a href="' + userList + '"><span class="badge bg-label-warning m-1">Manager</span></a>',
+                                    Users: '<a href="' + userList + '"><span class="badge bg-label-success m-1">Users</span></a>',
+                                    Support: '<a href="' + userList + '"><span class="badge bg-label-info m-1">Support</span></a>',
+                                    Restricted:
+                                        '<a href="' + userList + '"><span class="badge bg-label-danger m-1">Restricted User</span></a>'
+                                    };
+                                    for (var i = 0; i < $assignedTo.length; i++) {
+                                    var val = $assignedTo[i]['name'];
+                                    $output += roleBadgeObj[val];
+                                    }
+                                    return '<span class="text-nowrap">' + $output + '</span>';
+                                }
+                            },
+                            {
+                                // remove ordering from Name
+                                targets: 4,
+                                orderable: false,
+                                render: function (data, type, full, meta) {
+                                    var $date = full['created_at'];
+                                    return '<span class="text-nowrap">' + $date + '</span>';
+                                }
+                            },
+                            {
+                                // Actions
+                                targets: -1,
+                                searchable: false,
+                                title: 'Actions',
+                                orderable: false,
+                                render: function (data, type, full, meta) {
+                                    return (
+                                    '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2" data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
+                                    '<button class="btn btn-sm btn-icon delete-record"><i class="ti ti-trash"></i></button></span>'
+                                    );
+                                }
+                            }
+                        ],
+                        paging: true,
+                        lengthChange: true,
+                        pageLength: per_page || 10,
+                    });
+                }
+
+                $('.datatables-permissions tbody').on('click', '.delete-record', function () {
+                    dt_permission.row($(this).parents('tr')).remove().draw();
+                });
+
+                setTimeout(() => {
+                    $('.dataTables_filter .form-control').removeClass('form-control-sm');
+                    $('.dataTables_length .form-select').removeClass('form-select-sm');
+                }, 300);
+            }
+        });
+
+
+    });
+
+
 </script>
 @endsection
 
