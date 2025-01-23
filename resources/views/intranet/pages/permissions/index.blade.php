@@ -9,14 +9,27 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css')}}" />
 
-
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/sweetalert2/sweetalert2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/form-validation/form-validation.css')}}" />
 
 @endsection
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="mb-4">Permissions List</h4>
+    @if (session('success'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+        {{session('success')}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+    @if (session('error'))
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        {{session('error')}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    <h4 class="mb-4">Permisos</h4>
 
     <p class="mb-4">
       Each category (Basic, Professional, and Business) includes the four predefined roles shown below.
@@ -37,6 +50,19 @@
             </tr>
           </thead>
         </table>
+
+        {{-- <table id="datatable" class="table" style="width:100%">
+          <thead class="table-dark">
+              <tr>
+                <th></th>
+                <th></th>
+                <th>Name</th>
+                <th>Assigned To</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+              </tr>
+          </thead>
+      </table> --}}
       </div>
     </div>
     <!--/ Permission Table -->
@@ -53,34 +79,39 @@
             aria-label="Close"></button>
           <div class="modal-body">
             <div class="text-center mb-4">
-              <h3 class="mb-2">Add New Permission</h3>
-              <p class="text-muted">Permissions you may use and assign to your users.</p>
+              <h3 class="mb-2">Agregar Nuevo Permiso</h3>
+              <p class="text-muted">Permisos que puede utilizar y asignar a sus usuarios.</p>
             </div>
-            <form id="addPermissionForm" class="row" onsubmit="return false">
+            <form class="row" action="{{route('permissions.store')}}" method="POST">
+                @csrf
               <div class="col-12 mb-3">
-                <label class="form-label" for="modalPermissionName">Permission Name</label>
+                <label class="form-label" for="modalPermissionName"></label>
                 <input
                   type="text"
-                  id="modalPermissionName"
-                  name="modalPermissionName"
+                  name="name"
                   class="form-control"
-                  placeholder="Permission Name"
+                  placeholder="Nombre del permiso"
                   autofocus />
+                  <input
+                  type="text"
+                  name="guard_name"
+                  class="form-control"
+                  value="web" hidden/>
               </div>
-              <div class="col-12 mb-2">
+              {{-- <div class="col-12 mb-2">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="corePermission" />
                   <label class="form-check-label" for="corePermission"> Set as core permission </label>
                 </div>
-              </div>
+              </div> --}}
               <div class="col-12 text-center demo-vertical-spacing">
-                <button type="submit" class="btn btn-primary me-sm-3 me-1">Create Permission</button>
+                <button type="submit" class="btn btn-primary me-sm-3 me-1">Agregar Permiso</button>
                 <button
                   type="reset"
                   class="btn btn-label-secondary"
                   data-bs-dismiss="modal"
                   aria-label="Close">
-                  Discard
+                  Cancelar
                 </button>
               </div>
             </form>
@@ -101,37 +132,45 @@
             aria-label="Close"></button>
           <div class="modal-body">
             <div class="text-center mb-4">
-              <h3 class="mb-2">Edit Permission</h3>
-              <p class="text-muted">Edit permission as per your requirements.</p>
+              <h3 class="mb-2">Editar Permiso</h3>
+              <p class="text-muted">Edite el permiso según sus requisitos.</p>
             </div>
             <div class="alert alert-warning" role="alert">
               <h6 class="alert-heading mb-2">Warning</h6>
               <p class="mb-0">
-                By editing the permission name, you might break the system permissions functionality. Please
-                ensure you're absolutely certain before proceeding.
+                Al editar el nombre del permiso, es posible que se rompa la funcionalidad de permisos del sistema. Por favor
+                asegúrese de estar absolutamente seguro antes de continuar.
               </p>
             </div>
-            <form id="editPermissionForm" class="row" onsubmit="return false">
+            <form method="POST" action="{{ route('permissions.update', ':id') }}">
+                @csrf
+                @method('PUT')
               <div class="col-sm-9">
-                <label class="form-label" for="editPermissionName">Permission Name</label>
+                <label class="form-label" for="editPermissionName">Nombre del permiso</label>
                 <input
                   type="text"
-                  id="editPermissionName"
-                  name="editPermissionName"
+                  id="id"
+                  name="id"
                   class="form-control"
-                  placeholder="Permission Name"
+                  tabindex="-1" hidden />
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="form-control"
+                  placeholder="Nombre del permiso"
                   tabindex="-1" />
               </div>
               <div class="col-sm-3 mb-3">
                 <label class="form-label invisible d-none d-sm-inline-block">Button</label>
-                <button type="submit" class="btn btn-primary mt-1 mt-sm-0">Update</button>
+                <button type="submit" class="btn btn-primary mt-1 mt-sm-0">Actualizar</button>
               </div>
-              <div class="col-12">
+              {{-- <div class="col-12">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="editCorePermission" />
                   <label class="form-check-label" for="editCorePermission"> Set as core permission </label>
                 </div>
-              </div>
+              </div> --}}
             </form>
           </div>
         </div>
@@ -155,10 +194,12 @@
 <script src="{{asset('assets/js/modal-add-permission.js')}}"></script>
 <script src="{{asset('assets/js/modal-edit-permission.js')}}"></script>
 
+<script src="{{asset('assets/vendor/libs/sweetalert2/sweetalert2.js')}}"></script>
+
 <!-- jQuery desde CDN -->
 {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
-{{-- <script>
+<script>
 /**
  * App user list (jquery)
  */
@@ -170,25 +211,23 @@ $(function () {
     dt_permission,
     userList = 'app-user-list.html';
     var cantRegistros = 10;//dataTablePermissions.DataTable().page.len();
-    var apiUrl = 'http://127.0.0.1:8000/api/permissions?page=1&per_page='+cantRegistros;
+    var apiUrl = 'http://127.0.0.1:8000/api/permissions';
 
   // Users List datatable
   if (dataTablePermissions.length) {
 
     dt_permission = dataTablePermissions.DataTable({
-      //ajax: assetsPath + 'json/permissions-list.json', // JSON file to add data
+
       processing: true,
         serverSide: true,
       ajax: {
         url: apiUrl,
-       // dataSrc: 'data.data' // Ruta hacia los datos en la respuesta paginada
-       dataSrc: function (json) {
-        var data = json.data.data; // Los datos de la respuesta
-
-
-
-
-        return data;
+        data: function (d) {
+            // Envía los parámetros page y per_page
+            d.page = d.start / d.length + 1; // Calcula el número de página
+            d.per_page = d.length;
+            d.search = $('#DataTables_Table_0_filter input').val();
+            return d;
         }
       },
       columns: [
@@ -264,8 +303,8 @@ $(function () {
           orderable: false,
           render: function (data, type, full, meta) {
             return (
-              '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2" data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
-              '<button class="btn btn-sm btn-icon delete-record"><i class="ti ti-trash"></i></button></span>'
+              '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2 edit-btn" '+'data-id="' + full.id + '" '+'data-name="' + full.name + '" ' +' data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
+              '<button class="btn btn-sm btn-icon me-2 delete-btn" '+'data-id="' + full.id + '" '+'data-name="' + full.name + '" ><i class="ti ti-trash"></i></button></span>'
             );
           }
         }
@@ -346,6 +385,7 @@ $(function () {
         }
       },
       initComplete: function () {
+        var tableApi = this.api(); // Ensure correct context for `api()`
         // Adding role filter once table initialized
         this.api()
           .columns(3)
@@ -368,22 +408,10 @@ $(function () {
                 select.append('<option value="' + d + '" class="text-capitalize">' + d + '</option>');
               });
           });
+
+
       },
-      /* drawCallback: function (settings) {
-        console.log('settings: ',settings);
-        var api = this.api();
-        console.log('api: ',api);
-        var totalPages = api.page.info().pages;
-        console.log('total de paginas: ',totalPages);
-        // Lógica para manejar la paginación
-        /* if (totalPages > 1) {
-          // Muestra los controles de paginación
-          $('.dataTables_paginate').show();
-        } else {
-          // Oculta los controles si hay solo una página
-          $('.dataTables_paginate').hide();
-        }
-      } */
+
     });
   }
 
@@ -400,141 +428,85 @@ $(function () {
   }, 300);
 });
 
+$(document).on('click', '.edit-btn', function () {
+  // Obtener datos del botón
+  var id = $(this).data('id');
+  var name = $(this).data('name');
+  //var description = $(this).data('description');
+    console.log('name:', name);
+  // Llenar el formulario del modal
+  $('#editPermissionModal input[name="id"]').val(id);
+  $('#editPermissionModal input[name="name"]').val(name);
+  //$('#editPermissionModal textarea[name="description"]').val(description);
+});
 
-</script> --}}
+$(document).on('click', '.delete-btn', function () {
 
-<script>
-    $(document).ready(function () {
-        var dataTablePermissions = $('.datatables-permissions'),
-        dt_permission,
-        userList = 'app-user-list.html';
-        var cantRegistros = 10;//dataTablePermissions.DataTable().page.len();
-        var apiUrl = 'http://127.0.0.1:8000/api/permissions?page=1&per_page='+cantRegistros;
+    var id = $(this).data('id');
 
-        $.ajax({
-            url: apiUrl,
-            type: 'GET',
-            success: function (response) {
-
-                const {current_page, data, first_page_url, from, last_page, last_page_url, links, next_page_url, path, per_page, prev_page_url, to, total} = response;
-
-                if (dataTablePermissions.length){
-                    dt_permission = dataTablePermissions.DataTable({
-                        processing: true,
-                        serverSide: true,
-                        data: data || [],
-                        ajax: {
-                            url: apiUrl,
-                        // dataSrc: 'data.data' // Ruta hacia los datos en la respuesta paginada
-                            dataSrc: function (json) {
-                                //var data = json.data; // Los datos de la respuesta
-
-
-
-
-                                return json.data;
-                            }
-                        },
-                        columns: [
-                            // columns according to JSON
-                            { data: '' },
-                            { data: 'id' },
-                            { data: 'name' },
-                            { data: 'guard_name' },
-                            { data: 'created_at' },
-                            { data: '' }
-                        ],
-                        columnDefs: [
-                            {
-                                // For Responsive
-                                className: 'control',
-                                orderable: false,
-                                searchable: false,
-                                responsivePriority: 2,
-                                targets: 0,
-                                render: function (data, type, full, meta) {
-                                    return '';
-                                }
-                            },
-                            {
-                                targets: 1,
-                                searchable: false,
-                                visible: false
-                            },
-                            {
-                                // Name
-                                targets: 2,
-                                render: function (data, type, full, meta) {
-                                    var $name = full['name'];
-                                    return '<span class="text-nowrap">' + $name + '</span>';
-                                }
-                            },
-                            {
-                                // User Role
-                                targets: 3,
-                                orderable: false,
-                                render: function (data, type, full, meta) {
-                                    var $assignedTo = full['roles'],
-                                    $output = '';
-                                    var roleBadgeObj = {
-                                    Admin: '<a href="' + userList + '"><span class="badge bg-label-primary m-1">Administrator</span></a>',
-                                    Manager: '<a href="' + userList + '"><span class="badge bg-label-warning m-1">Manager</span></a>',
-                                    Users: '<a href="' + userList + '"><span class="badge bg-label-success m-1">Users</span></a>',
-                                    Support: '<a href="' + userList + '"><span class="badge bg-label-info m-1">Support</span></a>',
-                                    Restricted:
-                                        '<a href="' + userList + '"><span class="badge bg-label-danger m-1">Restricted User</span></a>'
-                                    };
-                                    for (var i = 0; i < $assignedTo.length; i++) {
-                                    var val = $assignedTo[i]['name'];
-                                    $output += roleBadgeObj[val];
-                                    }
-                                    return '<span class="text-nowrap">' + $output + '</span>';
-                                }
-                            },
-                            {
-                                // remove ordering from Name
-                                targets: 4,
-                                orderable: false,
-                                render: function (data, type, full, meta) {
-                                    var $date = full['created_at'];
-                                    return '<span class="text-nowrap">' + $date + '</span>';
-                                }
-                            },
-                            {
-                                // Actions
-                                targets: -1,
-                                searchable: false,
-                                title: 'Actions',
-                                orderable: false,
-                                render: function (data, type, full, meta) {
-                                    return (
-                                    '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2" data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
-                                    '<button class="btn btn-sm btn-icon delete-record"><i class="ti ti-trash"></i></button></span>'
-                                    );
-                                }
-                            }
-                        ],
-                        paging: true,
-                        lengthChange: true,
-                        pageLength: per_page || 10,
+      Swal.fire({
+        title: 'Estas seguro?',
+        text: "No podrás revertir el permiso!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Si, Eliminar permiso!',
+        cancelButtonText: 'No, Cancelar!',
+        customClass: {
+          confirmButton: 'btn btn-primary me-2 waves-effect waves-light',
+          cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+        },
+        buttonsStyling: false
+      }).then(function (result) {
+        if (result.value) {
+            $.ajax({
+                url: `/permissions/${id}`, // Endpoint de tu API
+                type: 'DELETE', // Método HTTP para eliminar
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Token CSRF
+                },
+                success: function (response) {
+                    // Mostrar mensaje de éxito y recargar la tabla
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Eliminado!',
+                        text: 'Permiso eliminado correctamente.',
+                        customClass: {
+                        confirmButton: 'btn btn-success waves-effect waves-light'
+                        }
+                    }).then(() => {
+                        // Recarga la tabla o realiza otras acciones necesarias
+                        $('.datatables-permissions').DataTable().ajax.reload();
+                    });
+                },
+                error: function (xhr) {
+                    // Manejar errores de la llamada AJAX
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo eliminar el permiso. Por favor, inténtelo de nuevo.',
+                        icon: 'error',
+                        customClass: {
+                        confirmButton: 'btn btn-danger waves-effect waves-light'
+                        }
                     });
                 }
-
-                $('.datatables-permissions tbody').on('click', '.delete-record', function () {
-                    dt_permission.row($(this).parents('tr')).remove().draw();
-                });
-
-                setTimeout(() => {
-                    $('.dataTables_filter .form-control').removeClass('form-control-sm');
-                    $('.dataTables_length .form-select').removeClass('form-select-sm');
-                }, 300);
+            });
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          Swal.fire({
+            title: 'Cancelada',
+            text: 'Eliminacion cancelada :)',
+            icon: 'error',
+            customClass: {
+              confirmButton: 'btn btn-success waves-effect waves-light'
             }
-        });
+          });
+        }
+      });
 
+});
 
-    });
 
 
 </script>
+
 @endsection
 

@@ -27,7 +27,7 @@ $(function () {
           // For Responsive
           className: 'control',
           orderable: false,
-          searchable: false,
+          searchable: true,
           responsivePriority: 2,
           targets: 0,
           render: function (data, type, full, meta) {
@@ -36,12 +36,13 @@ $(function () {
         },
         {
           targets: 1,
-          searchable: false,
+          searchable: true,
           visible: false
         },
         {
           // Name
           targets: 2,
+          searchable: true,
           render: function (data, type, full, meta) {
             var $name = full['name'];
             return '<span class="text-nowrap">' + $name + '</span>';
@@ -50,6 +51,7 @@ $(function () {
         {
           // User Role
           targets: 3,
+          searchable: true,
           orderable: false,
           render: function (data, type, full, meta) {
             var $assignedTo = full['assigned_to'],
@@ -72,6 +74,7 @@ $(function () {
         {
           // remove ordering from Name
           targets: 4,
+          searchable: true,
           orderable: false,
           render: function (data, type, full, meta) {
             var $date = full['created_date'];

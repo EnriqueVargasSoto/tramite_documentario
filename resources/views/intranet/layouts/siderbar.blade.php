@@ -45,6 +45,9 @@
                 <div data-i18n="Dashboards">Dashboards</div>
             </a>
         </li>
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text" data-i18n="Seguridad">Seguridad</span>
+        </li>
         <li class="menu-item">
             <a href="{{route('users.index')}}" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-users"></i>
@@ -68,6 +71,9 @@
                     </a>
                 </li>
             </ul>
+        </li>
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text" data-i18n="Maestros">Maestros</span>
         </li>
       {{-- <!-- Dashboards -->
       <li class="menu-item active open">

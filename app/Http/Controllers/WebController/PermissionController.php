@@ -33,6 +33,15 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         //
+        try {
+            Permission::create($request->all());
+            return redirect()->back()
+                ->with('success', 'Permiso agregado de manera correcta!');
+        } catch (\Error $e) {
+            //throw $th;
+            return redirect()->back()
+                ->with('error', 'Error al crear el permiso!');
+        }
     }
 
     /**
@@ -56,7 +65,18 @@ class PermissionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $permission = Permission::find($request->id);
+            $permission->name = $request->name;
+            $permission->save();
+
+            return redirect()->back()
+                ->with('success', 'Permiso editado de manera correcta!');
+        } catch (\Error $e) {
+            //throw $th;
+            return redirect()->back()
+                ->with('error', 'Error al editar el permiso!');
+        }
     }
 
     /**

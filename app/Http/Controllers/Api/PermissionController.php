@@ -14,9 +14,31 @@ class PermissionController extends Controller
     public function index(Request $request)
     {
         //
-        $permissions = Permission::with('roles')->orderBy('id','ASC')->paginate($request->per_page);
+        // Obtener los parámetros de paginación de la solicitud
+        $page = $request->get('page', 1);
+        $perPage = $request->get('per_page', 5);
+        $search = $request->get('search');
 
-        return response()->json( $permissions, 200);
+        $query = Permission::with('roles')->orderBy('id', 'asc');
+
+        // Aplicar la búsqueda si se proporciona un término
+        if ($search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhereHas('roles', function ($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $permissions = $query->paginate($perPage, '*', 'page', $page);
+
+        return response()->json([
+            'data' => $permissions->items(),
+            'draw' => intval($request->get('draw')),
+            'recordsTotal' => $permissions->total(),
+            'recordsFiltered' => $permissions->total(), // Si tienes filtrado
+        ]);
     }
 
     /**
