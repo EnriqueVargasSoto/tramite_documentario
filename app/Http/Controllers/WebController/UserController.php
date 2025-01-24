@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WebController;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -13,7 +14,8 @@ class UserController extends Controller
     public function index()
     {
         //
-        return view('intranet.pages.users.index');
+        $roles = Role::orderBy('id', 'asc')->get();
+        return view('intranet.pages.users.index', compact('roles'));
     }
 
     /**

@@ -87,7 +87,7 @@
                 value="{{ old('email') }}"
                 required
                 autocomplete="email"
-                placeholder="Enter your email or username"
+                placeholder="Ingresa tu email o usuario"
                 autofocus />
                 @error('email')
                     <span class="invalid-feedback" role="alert">
@@ -99,7 +99,7 @@
               <div class="d-flex justify-content-between">
                 <label class="form-label" for="password">Password</label>
                 <a href="{{ route('password.request') }}">
-                  <small>Forgot Password?</small>
+                  <small>¿Has olvidado tu contraseña?</small>
                 </a>
               </div>
               <div class="input-group input-group-merge">

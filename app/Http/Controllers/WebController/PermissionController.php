@@ -40,7 +40,7 @@ class PermissionController extends Controller
         } catch (\Error $e) {
             //throw $th;
             return redirect()->back()
-                ->with('error', 'Error al crear el permiso!');
+                ->with('error', $e);
         }
     }
 
@@ -65,25 +65,40 @@ class PermissionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        try {
+        //try {
             $permission = Permission::find($request->id);
             $permission->name = $request->name;
+            $permission->description = $request->description;
             $permission->save();
 
             return redirect()->back()
                 ->with('success', 'Permiso editado de manera correcta!');
-        } catch (\Error $e) {
+        /* } catch (\Error $e) {
             //throw $th;
             return redirect()->back()
                 ->with('error', 'Error al editar el permiso!');
-        }
+        } */
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
         //
+        try {
+            $permission = Permission::findOrFail($id);
+            $permission->status = 0;
+            $permission->save();
+
+            return response()->json(['success' => 'Permiso eliminado correctamente.']);
+            /* return redirect()->back()
+                ->with('success', 'Permiso eliminado de manera correcta!');
+            //code... */
+        } catch (\Error $e) {
+            //throw $th;
+            return redirect()->back()
+                ->with('error', 'Error al editar el permiso!');
+        }
     }
 }

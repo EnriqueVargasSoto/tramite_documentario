@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
           email: {
             validators: {
               notEmpty: {
-                message: 'Please enter your email'
+                message: 'Por favor ingrese su email'
               },
               emailAddress: {
                 message: 'Please enter valid email address'

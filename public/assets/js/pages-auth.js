@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
           email: {
             validators: {
               notEmpty: {
-                message: 'Please enter your email'
+                message: 'Por favor ingrese su email'
               },
               emailAddress: {
-                message: 'Please enter valid email address'
+                message: 'Por favor ingrese un email válido'
               }
             }
           },
@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
           password: {
             validators: {
               notEmpty: {
-                message: 'Please enter your password'
+                message: 'Por favor ingrese su contraseña'
               },
               stringLength: {
                 min: 6,
-                message: 'Password must be more than 6 characters'
+                message: 'La contraseña debe tener mínimo de 6 caracteres'
               }
             }
           },

@@ -43,26 +43,15 @@
             <tr>
               <th></th>
               <th></th>
-              <th>Name</th>
-              <th>Assigned To</th>
-              <th>Created Date</th>
-              <th>Actions</th>
+              <th>Permiso</th>
+              <th>Asignado a</th>
+              <th>Descripcion</th>
+              <th>Fecha de creación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
         </table>
-
-        {{-- <table id="datatable" class="table" style="width:100%">
-          <thead class="table-dark">
-              <tr>
-                <th></th>
-                <th></th>
-                <th>Name</th>
-                <th>Assigned To</th>
-                <th>Created Date</th>
-                <th>Actions</th>
-              </tr>
-          </thead>
-      </table> --}}
       </div>
     </div>
     <!--/ Permission Table -->
@@ -84,19 +73,26 @@
             </div>
             <form class="row" action="{{route('permissions.store')}}" method="POST">
                 @csrf
-              <div class="col-12 mb-3">
-                <label class="form-label" for="modalPermissionName"></label>
+              <div class="col-12">
+                <label class="form-label" for="editPermissionName">Nombre del permiso</label>
                 <input
                   type="text"
                   name="name"
                   class="form-control"
                   placeholder="Nombre del permiso"
                   autofocus />
+
                   <input
                   type="text"
                   name="guard_name"
                   class="form-control"
                   value="web" hidden/>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="editPermissionName">Descripcion del permiso</label>
+
+                  <textarea name="description" id="description" class="form-control" placeholder="Descripcion del permiso"></textarea>
+
               </div>
               {{-- <div class="col-12 mb-2">
                 <div class="form-check">
@@ -145,7 +141,7 @@
             <form method="POST" action="{{ route('permissions.update', ':id') }}">
                 @csrf
                 @method('PUT')
-              <div class="col-sm-9">
+              <div class="col-sm-12">
                 <label class="form-label" for="editPermissionName">Nombre del permiso</label>
                 <input
                   type="text"
@@ -160,6 +156,12 @@
                   class="form-control"
                   placeholder="Nombre del permiso"
                   tabindex="-1" />
+              </div>
+              <div class="col-sm-12">
+                <label class="form-label" for="editPermissionName">Descripcion del permiso</label>
+
+                  <textarea name="description" id="description" class="form-control" placeholder="Descripcion del permiso"></textarea>
+
               </div>
               <div class="col-sm-3 mb-3">
                 <label class="form-label invisible d-none d-sm-inline-block">Button</label>
@@ -196,6 +198,10 @@
 
 <script src="{{asset('assets/vendor/libs/sweetalert2/sweetalert2.js')}}"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+
+
 <!-- jQuery desde CDN -->
 {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
@@ -209,9 +215,15 @@
 $(function () {
   var dataTablePermissions = $('.datatables-permissions'),
     dt_permission,
+
     userList = 'app-user-list.html';
     var cantRegistros = 10;//dataTablePermissions.DataTable().page.len();
     var apiUrl = 'http://127.0.0.1:8000/api/permissions';
+    const statusObj = {
+            /* 1: { title: 'Pending', class: 'bg-label-warning' }, */
+            1: { title: 'Activo', class: 'bg-label-success' },
+            0: { title: 'Inactivo', class: 'bg-label-secondary' }
+            };
 
   // Users List datatable
   if (dataTablePermissions.length) {
@@ -236,7 +248,9 @@ $(function () {
         { data: 'id' },
         { data: 'name' },
         { data: 'guard_name' },
+        { data: 'description' },
         { data: 'created_at' },
+        { data: 'status' },
         { data: '' }
       ],
       columnDefs: [
@@ -279,20 +293,49 @@ $(function () {
               Restricted:
                 '<a href="' + userList + '"><span class="badge bg-label-danger m-1">Restricted User</span></a>'
             };
+            var defaultBadge =  '<a href="' + userList + '"><span class="badge bg-label-success m-1">Users</span></a>';
+                            // Si $role no existe en roleBadgeObj, se usa el ícono por defecto
+                            //var badge = roleBadgeObj[$role] || defaultBadge;
             for (var i = 0; i < $assignedTo.length; i++) {
               var val = $assignedTo[i]['name'];
-              $output += roleBadgeObj[val];
+              $output += roleBadgeObj[val] || defaultBadge;
             }
             return '<span class="text-nowrap">' + $output + '</span>';
           }
         },
         {
-          // remove ordering from Name
+          // Name
           targets: 4,
+          render: function (data, type, full, meta) {
+            var $description = full['description'] != null ? full['description'] : 'No description';
+            return '<span class="text-nowrap">' + $description + '</span>';
+          }
+        },
+        {
+          // remove ordering from Name
+          targets: 5,
           orderable: false,
           render: function (data, type, full, meta) {
             var $date = full['created_at'];
-            return '<span class="text-nowrap">' + $date + '</span>';
+            var formattedDate = moment.utc($date).tz('America/Lima').format('DD/MM/YYYY hh:mm:ss A'); // Cambia 'America/Lima' según tu zona horaria
+
+            return '<span class="text-nowrap">' + formattedDate + '</span>';
+          }
+        },
+        {
+          // remove ordering from Name
+          targets: 6,
+          orderable: false,
+          render: function (data, type, full, meta) {
+             var $status = full['status'];
+
+                            return (
+                            '<span class="badge ' +
+                            statusObj[$status].class +
+                            '" text-capitalized>' +
+                            statusObj[$status].title +
+                            '</span>'
+                            );
           }
         },
         {
@@ -303,8 +346,8 @@ $(function () {
           orderable: false,
           render: function (data, type, full, meta) {
             return (
-              '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2 edit-btn" '+'data-id="' + full.id + '" '+'data-name="' + full.name + '" ' +' data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
-              '<button class="btn btn-sm btn-icon me-2 delete-btn" '+'data-id="' + full.id + '" '+'data-name="' + full.name + '" ><i class="ti ti-trash"></i></button></span>'
+              '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2 edit-btn" '+'data-id="' + full.id + '" '+'data-name="' + full.name + '" '+'data-description="' + full.description + '" ' +' data-bs-target="#editPermissionModal" data-bs-toggle="modal" data-bs-dismiss="modal"><i class="ti ti-edit"></i></button>' +
+              '<button class="btn btn-sm btn-icon me-2 delete-btn" '+'data-id="' + full.id + '" '+'data-name="' + full + '" ><i class="ti ti-trash"></i></button></span>'
             );
           }
         }
@@ -432,17 +475,18 @@ $(document).on('click', '.edit-btn', function () {
   // Obtener datos del botón
   var id = $(this).data('id');
   var name = $(this).data('name');
-  //var description = $(this).data('description');
+  var description = $(this).data('description');
     console.log('name:', name);
   // Llenar el formulario del modal
   $('#editPermissionModal input[name="id"]').val(id);
   $('#editPermissionModal input[name="name"]').val(name);
-  //$('#editPermissionModal textarea[name="description"]').val(description);
+  $('#editPermissionModal textarea[name="description"]').val(description);
 });
 
 $(document).on('click', '.delete-btn', function () {
 
     var id = $(this).data('id');
+    var permission = $(this).data('name');
 
       Swal.fire({
         title: 'Estas seguro?',
@@ -457,6 +501,9 @@ $(document).on('click', '.delete-btn', function () {
         },
         buttonsStyling: false
       }).then(function (result) {
+        console.log('id: ', id);
+        console.log('ruta: ', `/permissions/${permission}`);
+        console.log('result: ', result);
         if (result.value) {
             $.ajax({
                 url: `/permissions/${id}`, // Endpoint de tu API
@@ -466,6 +513,8 @@ $(document).on('click', '.delete-btn', function () {
                 },
                 success: function (response) {
                     // Mostrar mensaje de éxito y recargar la tabla
+
+                    console.log('response: ', response);
                     Swal.fire({
                         icon: 'success',
                         title: 'Eliminado!',
@@ -479,6 +528,7 @@ $(document).on('click', '.delete-btn', function () {
                     });
                 },
                 error: function (xhr) {
+                    console.log(xhr);
                     // Manejar errores de la llamada AJAX
                     Swal.fire({
                         title: 'Error',
