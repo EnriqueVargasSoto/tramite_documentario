@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,3 +13,4 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('permissions', PermissionController::class);
 Route::apiResource('roles', RoleController::class);
+Route::apiResource('users', UserController::class);

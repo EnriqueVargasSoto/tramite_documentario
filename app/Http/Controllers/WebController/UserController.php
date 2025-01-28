@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\WebController;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
@@ -31,7 +32,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'lastname' => $request->lastname,
+                'email' => $request->email,
+                'password' => bcrypt($request->password)
+            ]);
+
+            $role = Role::findById($request->role_id)->name;
+
+            $user->assignRole([$role]);
+
+            return redirect()->back()
+                ->with('success', 'Usuario agregado de manera correcta!');
+        } catch (\Error $e) {
+            //throw $th;
+            return redirect()->back()
+                ->with('error', $e);
+        }
     }
 
     /**
