@@ -75,6 +75,32 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         //
+
+        try {
+
+            $user = User::find($request->id);
+            $user->name = $request->name;
+            $user->lastname = $request->lastname;
+            $user->email = $request->email;
+
+            if ($request->password) {
+                $user->password = bcrypt($request->password);
+            }
+
+            $user->save();
+
+
+            $role = Role::findById($request->role_id)->name;
+
+            $user->syncRoles([$role]);
+
+            return redirect()->back()
+                ->with('success', 'Usuario actualizado de manera correcta!');
+        } catch (\Error $e) {
+            //throw $th;
+            return redirect()->back()
+                ->with('error', $e);
+        }
     }
 
     /**

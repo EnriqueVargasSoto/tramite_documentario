@@ -126,9 +126,9 @@
       <div class="card-header border-bottom">
         <h5 class="card-title mb-3">Filtro de Búsqueda</h5>
         <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
-          <div class="col-md-6 user_role"></div>
+          <div class="col-md-4 user_role"></div>
           {{-- <div class="col-md-4 user_plan"></div> --}}
-          <div class="col-md-6 user_status"></div>
+          {{-- <div class="col-md-6 user_status"></div> --}}
         </div>
       </div>
       <div class="card-datatable table-responsive">
@@ -199,84 +199,100 @@
                   type="password"
                   class="form-control"
                   id="add-user-fullname"
-                  placeholder="Apellidos"
+                  placeholder="*****"
                   name="password"
-                  aria-label="***" />
+                  aria-label="*****" />
               </div>
-            {{-- <div class="mb-3">
-              <label class="form-label" for="add-user-contact">Contact</label>
-              <input
-                type="text"
-                id="add-user-contact"
-                class="form-control phone-mask"
-                placeholder="+1 (609) 988-44-11"
-                aria-label="john.doe@example.com"
-                name="userContact" />
-            </div> --}}
-            {{-- <div class="mb-3">
-              <label class="form-label" for="add-user-company">Company</label>
-              <input
-                type="text"
-                id="add-user-company"
-                class="form-control"
-                placeholder="Web Developer"
-                aria-label="jdoe1"
-                name="companyName" />
-            </div> --}}
-            {{-- <div class="mb-3">
-              <label class="form-label" for="country">Country</label>
-              <select id="country" class="select2 form-select">
-                <option value="">Select</option>
-                <option value="Australia">Australia</option>
-                <option value="Bangladesh">Bangladesh</option>
-                <option value="Belarus">Belarus</option>
-                <option value="Brazil">Brazil</option>
-                <option value="Canada">Canada</option>
-                <option value="China">China</option>
-                <option value="France">France</option>
-                <option value="Germany">Germany</option>
-                <option value="India">India</option>
-                <option value="Indonesia">Indonesia</option>
-                <option value="Israel">Israel</option>
-                <option value="Italy">Italy</option>
-                <option value="Japan">Japan</option>
-                <option value="Korea">Korea, Republic of</option>
-                <option value="Mexico">Mexico</option>
-                <option value="Philippines">Philippines</option>
-                <option value="Russia">Russian Federation</option>
-                <option value="South Africa">South Africa</option>
-                <option value="Thailand">Thailand</option>
-                <option value="Turkey">Turkey</option>
-                <option value="Ukraine">Ukraine</option>
-                <option value="United Arab Emirates">United Arab Emirates</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="United States">United States</option>
-              </select>
-            </div> --}}
             <div class="mb-3">
               <label class="form-label" for="user-role">Rol de Usuario</label>
               <select id="user-role" class="form-select" name="role_id">
                 @foreach ($roles as $role)
                 <option value="{{$role->id}}">{{$role->name}}</option>
                 @endforeach
-                {{-- <option value="subscriber">Subscriber</option>
-                <option value="editor">Editor</option>
-                <option value="maintainer">Maintainer</option>
-                <option value="author">Author</option>
-                <option value="admin">Admin</option> --}}
               </select>
             </div>
-            {{-- <div class="mb-4">
-              <label class="form-label" for="user-plan">Select Plan</label>
-              <select id="user-plan" class="form-select">
-                <option value="basic">Basic</option>
-                <option value="enterprise">Enterprise</option>
-                <option value="company">Company</option>
-                <option value="team">Team</option>
+            <button type="submit" class="btn btn-primary me-sm-3 me-1 data-submit">Agregar</button>
+            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancelar</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Offcanvas to add new user -->
+      <div
+        class="offcanvas offcanvas-end"
+        tabindex="-1"
+        id="offcanvasEditUser"
+        aria-labelledby="offcanvasEditUserLabel">
+        <div class="offcanvas-header">
+          <h5 id="offcanvasEditUserLabel" class="offcanvas-title">Editar Usuario</h5>
+          <button
+            type="button"
+            class="btn-close text-reset"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
+          <form class="add-new-user pt-0" action="{{route('users.update', ':id')}}" method="POST">
+            @csrf
+            @method('PUT')
+            <input
+                  type="text"
+                  id="id"
+                  name="id"
+                  class="form-control"
+                  tabindex="-1" hidden />
+            <div class="mb-3">
+              <label class="form-label" for="add-user-fullname">Nombres</label>
+              <input
+                type="text"
+                class="form-control"
+                id="add-user-fullname"
+                placeholder="Nombres"
+                name="name"
+                aria-label="John Doe" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="add-user-fullname">Apellidos</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="add-user-fullname"
+                  placeholder="Apellidos"
+                  name="lastname"
+                  aria-label="John Doe" />
+              </div>
+            <div class="mb-3">
+              <label class="form-label" for="add-user-email">Email</label>
+              <input
+                type="text"
+                id="add-user-email"
+                class="form-control"
+                placeholder="john.doe@example.com"
+                aria-label="john.doe@example.com"
+                name="email" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="add-user-fullname">Contraseña</label>
+                <input
+                  type="password"
+                  class="form-control"
+
+                  placeholder="*****"
+                  name="password"
+                  />
+              </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="user-role">Rol de Usuario</label>
+              <select id="user-role" class="form-select" name="role_id">
+                @foreach ($roles as $role)
+                <option value="{{$role->id}}">{{$role->name}}</option>
+                @endforeach
+
               </select>
-            </div> --}}
-            <button type="submit" class="btn btn-primary me-sm-3 me-1 data-submit">Submit</button>
-            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+            </div>
+            <button type="submit" class="btn btn-primary me-sm-3 me-1 data-submit">Actualizar</button>
+            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancelar</button>
           </form>
         </div>
       </div>
@@ -383,7 +399,7 @@ $(function () {
                     targets: 1,
                     responsivePriority: 4,
                     render: function (data, type, full, meta) {
-                        var $name = full['name'] + full['lastname'],
+                        var $name = full['name'] +' '+ full['lastname'],
                         $email = full['email'],
                         $image = full['avatar'];
                         if ($image) {
@@ -394,8 +410,10 @@ $(function () {
                             var stateNum = Math.floor(Math.random() * 6);
                             var states = ['success', 'danger', 'warning', 'info', 'primary', 'secondary'];
                             var $state = states[stateNum],
-                                $name = full['name'],
+                                $lastname = full['lastname'] ?? '',
+                                $name = full['name'] +' '+ $lastname,
                                 $initials = $name.match(/\b\w/g) || [];
+                                console.log('initials: ', $initials);
                             $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
                             $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
                         }
@@ -478,7 +496,7 @@ $(function () {
                     render: function (data, type, full, meta) {
                         return (
                             '<div class="d-flex align-items-center">' +
-                            '<a href="javascript:;" class="text-body"><i class="ti ti-edit ti-sm me-2"></i></a>' +
+                            '<span class="text-nowrap"><button class="btn btn-sm btn-icon me-2 edit-btn" '+'data-id="' + full.id + '" '+'data-name="' + full.name + '" '+'data-lastname="' + full.lastname + '" data-email="'+full.email+'" data-role="'+full.roles[0].id+'" data-bs-target="#offcanvasEditUser" data-bs-toggle="offcanvas"><i class="ti ti-edit"></i></button>' +
                             '<a href="javascript:;" class="text-body delete-record"><i class="ti ti-trash ti-sm mx-2"></i></a>' +
                             '<a href="javascript:;" class="text-body dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm mx-1"></i></a>' +
                             '<div class="dropdown-menu dropdown-menu-end m-0">' +
@@ -765,12 +783,15 @@ $(function () {
                         var val = $.fn.dataTable.util.escapeRegex($(this).val());
                         column.search(val ? '^' + val + '$' : '', true, false).draw();
                     });
-                    console.log('column: ',column.data());
+                    console.log('column: ',column);
+                    console.log('statusObj: ',statusObj);
+
                     column
                     .data()
                     .unique()
                     .sort()
                     .each(function (d, j) {
+
                         console.log('d: ',d);
                         select.append(
                         '<option value="' +
@@ -796,6 +817,24 @@ $(function () {
     $('.dataTables_filter .form-control').removeClass('form-control-sm');
     $('.dataTables_length .form-select').removeClass('form-select-sm');
   }, 300);
+});
+
+$(document).on('click', '.edit-btn', function () {
+  // Obtener datos del botón
+  var id = $(this).data('id');
+  var name = $(this).data('name');
+  var lastname = $(this).data('lastname');
+  var email = $(this).data('email');
+  var role = $(this).data('role');
+  //var description = $(this).data('description');
+    console.log('role:', role);
+  // Llenar el formulario del modal
+  $('#offcanvasEditUser input[name="id"]').val(id);
+  $('#offcanvasEditUser input[name="name"]').val(name);
+  $('#offcanvasEditUser input[name="lastname"]').val(lastname);
+  $('#offcanvasEditUser input[name="email"]').val(email);
+  $('#offcanvasEditUser select[name="role_id"]').val(role);
+  //$('#offcanvasEditUser textarea[name="description"]').val(description);
 });
 </script>
 @endsection
